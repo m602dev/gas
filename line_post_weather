@@ -1,0 +1,28 @@
+function getForcastData(){
+}
+
+function rainychk(rainyArray, value){
+ var msg = ''
+ var rainymsg = ''
+ var i = rainyArray.length - 1
+ // valueの値以上になったらメッセージ文を代入
+ // 夜の時間帯は営業時間から外れるため判定から除外
+ if(rainyArray[i-3] >= value) rainymsg += ' 朝:' + rainyArray[i-3] + '%'
+ if(rainyArray[i-2] >= value) rainymsg += ' 昼前:' + rainyArray[i-2] + '%'
+ if(rainyArray[i-1] >= value) rainymsg += ' 昼間:' + rainyArray[i-1] + '%'
+ if((rainyArray[i] >= value)&&(rainymsg != "")) rainymsg += ' 夜:' + rainyArray[i] + '%'
+ if(rainymsg != '') msg = '降水確率は' + rainymsg + ' になっています。'
+ return msg;
+}
+
+function broadcast_fetch_data(postData) {
+  var options = {
+    "method": "post",
+    "headers": {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + "LINEのアクセストークン"
+    },
+    "payload": JSON.stringify(postData)
+  };
+  UrlFetchApp.fetch("https://api.line.me/v2/bot/message/broadcast", options);
+}
