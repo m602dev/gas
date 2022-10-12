@@ -1,0 +1,36 @@
+function send(){
+  const options = { cc: 'EMAIL_ADDRESS',name: 'NAME' };
+  var sub =  "";
+  var txt = "";
+  GmailApp.sendEmail("SEND_EMAIL_ADDRESS", sub, txt, options);
+}
+
+function get_mail() {
+  const query = 'label:*** after:' + Utilities.formatDate(new Date(), "JST","yyyy/MM/dd"); //今日の日付
+  const threads = GmailApp.search(query);
+  var txt = "";
+  var cnt = 0;
+
+  for(const thread of threads){
+    var messages = thread.getMessages();
+
+    for (var j = 0; j < messages.length; j++) {
+        var message = messages[j];
+        var body = message.getBody();
+
+        //メールの内容を配列化（改行ごと）
+        let mailBodyArray = body.split("\r\n");
+        for (var a = 0; a < mailBodyArray.length; a++) {   
+          if(mailBodyArray[a].indexOf('***') != -1) txt += mailBodyArray[a].substring(0,0); //特定の文字が存在するとき所定の箇所を抜き取る
+        }
+        
+        cnt++;
+    }      
+  }
+
+  var data = {
+    cnt : cnt,
+    txt : txt
+  }
+  return JSON.stringify(data);
+}
