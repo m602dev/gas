@@ -1,0 +1,39 @@
+const ACCESS_TOKEN = "{LINE ACCESS TOKEN}"
+const calendar_ID = "×××××××××××××××××@group.calendar.google.com"; 
+const calendar = CalendarApp.getCalendarById(calendar_ID);
+const events = calendar.getEventsForDay("取得したい日にち");
+  
+function getEvent(){
+  var msgContent = "";
+  for(const event of events){
+    //var desc = event.getDescription(); /*予定の説明。今回はメッセージの体裁を考え保留に。*/
+    var scheduleTitle = event.getTitle(); //予定のタイトル
+    var startTime = Utilities.formatDate(event.getStartTime(), 'JST', 'HH:mm'); //予定の開始日(終日のときは00:00)
+    var endTime = Utilities.formatDate(event.getEndTime(), 'JST', 'HH:mm'); //予定の終了日(終日のときは00:00)
+    var time = event.isAllDayEvent() ? "" : "（" + startTime + " ～ " + endTime + "）"; //開始時間～終了時間のフォーマットを生成(終日のときは空白)
+    msgContent += "\n◯" + scheduleTitle + time + "\n"; //こんな形で予定を表示させる
+  };
+
+  //イベント情報が格納された時のみ投稿処理
+  if(msgContent == "") return;
+  
+  var postData = {
+    'messages': [{
+    'type': 'text',
+    'text': header + msgContent + footer //ここではイベント情報に上・下部のメッセージ（header,footer）の変数を挟む *完成形を参照
+    }],
+  };
+  broadcast_fetch_data(postData);       
+}
+  
+function broadcast_fetch_data(postData) {
+  var options = {
+    "method": "post",
+    "headers": {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + ACCESS_TOKEN
+    },
+    "payload": JSON.stringify(postData)
+  };
+  UrlFetchApp.fetch("https://api.line.me/v2/bot/message/broadcast", options);
+}  
