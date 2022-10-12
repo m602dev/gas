@@ -1,6 +1,47 @@
+const ACCESS_TOKEN = "{LINE ACCESS TOKEN}";
+
+//FETCH_URL
+var broadcast_url = "https://api.line.me/v2/bot/message/broadcast";
+var reply_url = "https://api.line.me/v2/bot/message/reply";
 
 
-function broadcast_fetch_data(postData) {
+//LINEからのイベントがdoPostにとんでくる
+function doPost(e) {
+
+  var json = e.postData.contents
+  var events = JSON.parse(json).events;
+
+  //とんできたイベントの種類を確認する
+  events.forEach(function(event) {
+    //もしイベントの種類がトークによるテキストメッセージだったら
+    if((event.type == "message")&&(event.message.type == "text")) reply_main(event);
+  });
+}
+
+function reply_main(event){
+  //受信したテキスト
+  var rev_txt = event.message.text;
+
+  //自動返信メッセージの内容
+  var message = {
+        "replyToken" : event.replyToken,
+        "messages" : [{"type": "text","text" : "You said " + rev_txt}]
+      };
+  fetch_data(reply_url,message); 
+}
+
+
+function send_main(){
+  var postData = {
+    'messages': [{
+    'type': 'text',
+    'text': 'hahaha'
+    }],
+  };
+  fetch_data(broadcast_url,postData); 
+}
+
+function fetch_data(url,postData) {
   var options = {
     "method": "post",
     "headers": {
@@ -9,5 +50,5 @@ function broadcast_fetch_data(postData) {
     },
     "payload": JSON.stringify(postData)
   };
-  UrlFetchApp.fetch("https://api.line.me/v2/bot/message/broadcast", options);
+  UrlFetchApp.fetch(url, options);
 }
