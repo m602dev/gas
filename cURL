@@ -1,0 +1,19 @@
+function myFunction() {
+  var url = "";
+
+  var headers = {
+    "Authorization": "",
+    "Content-type": "application/json"
+  }
+
+  var data = {
+  }
+
+  var options = {
+    "method": "post",
+    "payload": JSON.stringify(data),
+    "headers": headers
+  };
+  
+  UrlFetchApp.fetch(url, options);  
+}
