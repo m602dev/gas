@@ -1,0 +1,21 @@
+const cal = CalendarApp.getCalendarById('{CALENDAR_ID}');
+
+function createEvent(){
+  var date = new Date();
+  cal.createAllDayEvent("title", date);
+}
+
+function getCalenderEvent() {
+
+  //開始日と終了日を設定
+  let startDate = new Date('2000/01/01 0:0:0');
+  let endDate = new Date('2000/01/01 23:59:59');
+
+  //イベントを取得
+  let myEvent = myCalendar.getEvents(startDate, endDate);
+  
+  for(let i = 0 ; i < myEvent.length ; i++ ){
+    title = myEvent[i].getTitle();
+    myEvent[i].setTitle('title'); //タイトルの変更
+  }
+}
