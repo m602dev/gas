@@ -1,18 +1,61 @@
+const ACCESS_TOKEN = "{LINE ACCESS TOKEN}"
+
 function getForcastData(){
+  const response = UrlFetchApp.fetch(`https://www.jma.go.jp/bosai/forecast/data/forecast/350000.json`); //山口の気象データを取得
+  const data = JSON.parse(response);
+  
+  //取得する時間によって格納される値の数が変動する（今日の過ぎた時間帯の値は入らない）ので、発表された時刻を指定（今回は17時発表を採用）
+  var date = new Date(); //対象の日付を格納
+  var datetime = Utilities.formatDate(date, 'Asia/Tokyo', 'yyyy-MM-dd') + 'T17:00:00+09:00';
+  if(datetime != data[0].reportDatetime) return;  
+  
+  //雨判定
+  var rainy_msg = rainychk(data[0].timeSeries[1].areas[1].pops,'50');
+  if(rainy_msg == '') return;
+  
+  //値が入っていれば投稿処理へ
+  var tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  var tomorrowformat = Utilities.formatDate(tomorrow, 'Asia/Tokyo', 'M/d');
+  var title = '【明日は雨の予報☂ 限定クーポン配信】';
+  var header = 'こんばんは\uDBC0\uDC02\n\n'
+  var footer = '\n\nお出かけの際はお気をつけ下さいませ。\n\n↓雨の日限定クーポンお知らせ↓'
+  var msg = title + '\n\n' + header + '明日' + tomorrowformat + 'の山口は雨の予報です☂\n' + rainy_msg + footer;
+  var imageURL = '販促画像リンク';
+  var postData = {
+    'messages': [{
+    'type': 'text',
+    'text': msg
+    },{
+      "type": "flex",
+      "altText": title,
+      "contents": {
+        "type": "bubble",
+        "hero": {
+          "type": "image",
+          "url": imageURL,
+          "size": "full",
+          "aspectRatio": "1:1.035",
+          "aspectMode": "cover"
+        }
+      }
+    }],
+  };
+  broadcast_fetch_data(postData);  
 }
 
 function rainychk(rainyArray, value){
- var msg = ''
- var rainymsg = ''
- var i = rainyArray.length - 1
- // valueの値以上になったらメッセージ文を代入
- // 夜の時間帯は営業時間から外れるため判定から除外
- if(rainyArray[i-3] >= value) rainymsg += ' 朝:' + rainyArray[i-3] + '%'
- if(rainyArray[i-2] >= value) rainymsg += ' 昼前:' + rainyArray[i-2] + '%'
- if(rainyArray[i-1] >= value) rainymsg += ' 昼間:' + rainyArray[i-1] + '%'
- if((rainyArray[i] >= value)&&(rainymsg != "")) rainymsg += ' 夜:' + rainyArray[i] + '%'
- if(rainymsg != '') msg = '降水確率は' + rainymsg + ' になっています。'
- return msg;
+  var msg = '';
+  var rainymsg = '';
+  var i = rainyArray.length - 1;
+  // valueの値以上になったらメッセージ文を代入
+  // 夜の時間帯は営業時間から外れるため判定から除外
+  if(rainyArray[i-3] >= value) rainymsg += ' 朝:' + rainyArray[i-3] + '%';
+  if(rainyArray[i-2] >= value) rainymsg += ' 昼前:' + rainyArray[i-2] + '%';
+  if(rainyArray[i-1] >= value) rainymsg += ' 昼間:' + rainyArray[i-1] + '%';
+  if((rainyArray[i] >= value)&&(rainymsg != "")) rainymsg += ' 夜:' + rainyArray[i] + '%';
+  if(rainymsg != '') msg = '降水確率は' + rainymsg + ' になっています。';
+  return msg;
 }
 
 function broadcast_fetch_data(postData) {
@@ -20,7 +63,7 @@ function broadcast_fetch_data(postData) {
     "method": "post",
     "headers": {
       "Content-Type": "application/json",
-      "Authorization": "Bearer " + "LINEのアクセストークン"
+      "Authorization": "Bearer " + ACCESS_TOKEN
     },
     "payload": JSON.stringify(postData)
   };
