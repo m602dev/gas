@@ -21,7 +21,7 @@ function getForcastData(){
   var header = 'こんばんは\uDBC0\uDC02\n\n'
   var footer = '\n\nお出かけの際はお気をつけ下さいませ。\n\n↓雨の日限定クーポンお知らせ↓'
   var msg = title + '\n\n' + header + '明日' + tomorrowformat + 'の山口は雨の予報です☂\n' + rainy_msg + footer;
-  var imageURL = '販促画像リンク';
+  var imageURL = '販促画像リンク'; //https://drive.google.com/uc?id=
   var postData = {
     'messages': [{
     'type': 'text',
