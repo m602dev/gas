@@ -25,7 +25,7 @@ function dueForcast(){
   if(getMaxtemp(data) > hot_limit) hotday(getMaxtemp(data));
 
   //最低気温
-  if(getMintemp(data) < cold_limit) hotday(getMintemp(data));  
+  if(getMintemp(data) < cold_limit) coldday(getMintemp(data));  
 }
 
 function rainychk(rainyArray, value){
